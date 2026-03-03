@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日下農園 JGAP記録管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f2eb;
+  --surface: #fffef9;
+  --surface2: #f0ede4;
+  --border: #ddd9cc;
+  --border2: #c8c3b2;
+  --text: #2a2720;
+  --text2: #6b6458;
+  --text3: #9c9488;
+  --accent-citrus: #d4820a;
+  --accent-citrus-light: #fef3e0;
+  --accent-berry: #5a3e8c;
+  --accent-berry-light: #f0ebfa;
+  --accent-green: #2d6a3f;
+  --accent-green-light: #e8f4ec;
+  --accent-red: #b83232;
+  --accent-red-light: #fdeaea;
+  --accent-blue: #1e5fa8;
+  --accent-blue-light: #e8f0fb;
+  --shadow: 0 2px 8px rgba(42,39,32,0.08);
+  --shadow-md: 0 4px 16px rgba(42,39,32,0.12);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+.app-header {
+  background: var(--text);
+  color: #fff;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.app-header .logo {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-header .logo-badge {
+  background: var(--accent-citrus);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.08em;
+}
+.header-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+}
+
+/* ── LAYOUT ── */
+.app-body {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 220px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  flex-shrink: 0;
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+.sidebar-section {
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 8px 8px 4px;
+}
+.sidebar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 400;
+  text-align: left;
+  transition: all 0.15s;
+}
+.sidebar-btn:hover { background: var(--surface2); color: var(--text); }
+.sidebar-btn.active { background: var(--text); color: #fff; font-weight: 500; }
+.sidebar-btn .icon { font-size: 15px; width: 20px; text-align: center; }
+.sidebar-divider { height: 1px; background: var(--border); margin: 8px 16px; }
+
+/* ── MAIN ── */
+.main-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  max-width: 1100px;
+}
+
+/* ── PAGE TITLES ── */
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.page-subtitle {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── FORM ── */
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.form-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.form-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.form-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-group.span2 { grid-column: span 2; }
+.form-group.span3 { grid-column: span 3; }
+.form-group.span4 { grid-column: span 4; }
+label { font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: 0.04em; }
+label .required { color: var(--accent-red); margin-left: 2px; }
+input, select, textarea {
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent-citrus);
+  box-shadow: 0 0 0 3px rgba(212,130,10,0.12);
+}
+textarea { resize: vertical; min-height: 72px; }
+input[type="number"] { font-family: 'DM Mono', monospace; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+.btn-primary {
+  background: var(--text);
+  color: #fff;
+}
+.btn-primary:hover { background: #3d3830; transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-citrus { background: var(--accent-citrus); color: #fff; }
+.btn-citrus:hover { background: #b86f08; transform: translateY(-1px); }
+.btn-danger { background: var(--accent-red); color: #fff; }
+.btn-danger:hover { background: #962828; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { background: var(--surface2); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { background: var(--text); color: #fff; }
+thead th { padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; letter-spacing: 0.05em; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td { padding: 10px 12px; vertical-align: middle; }
+tbody td .mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+.empty-row td { text-align: center; color: var(--text3); padding: 32px; font-size: 13px; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-citrus { background: var(--accent-citrus-light); color: var(--accent-citrus); }
+.badge-berry  { background: var(--accent-berry-light);  color: var(--accent-berry); }
+.badge-green  { background: var(--accent-green-light);  color: var(--accent-green); }
+.badge-red    { background: var(--accent-red-light);    color: var(--accent-red); }
+.badge-blue   { background: var(--accent-blue-light);   color: var(--accent-blue); }
+.badge-gray   { background: var(--surface2); color: var(--text2); }
+
+/* ── STAT CARDS ── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.stat-label { font-size: 11px; color: var(--text3); font-weight: 500; margin-bottom: 6px; }
+.stat-value { font-size: 26px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text); line-height: 1; }
+.stat-unit  { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* ── INVENTORY ── */
+.inv-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; margin-top: 4px; }
+.inv-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+.inv-ok   { background: var(--accent-green); }
+.inv-warn { background: var(--accent-citrus); }
+.inv-crit { background: var(--accent-red); }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; background: var(--surface2); padding: 4px; border-radius: var(--radius); }
+.tab-btn {
+  padding: 7px 16px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab-btn.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ── ALERT ── */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.alert-warn { background: var(--accent-citrus-light); color: #7a4800; border-left: 3px solid var(--accent-citrus); }
+.alert-info { background: var(--accent-blue-light); color: #0d3d6e; border-left: 3px solid var(--accent-blue); }
+
+/* ── DELETE BTN ── */
+.del-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 14px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.del-btn:hover { color: var(--accent-red); background: var(--accent-red-light); }
+
+/* ── PAGES ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── NOTICE ── */
+.notion-tip {
+  background: var(--text);
+  color: rgba(255,255,255,0.85);
+  padding: 10px 16px;
+  font-size: 11px;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+.notion-tip strong { color: #fff; }
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.section-title { font-size: 13px; font-weight: 700; color: var(--text2); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .sidebar { width: 100%; height: auto; position: relative; top: 0; border-right: none; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; padding: 8px; gap: 4px; }
+  .app-body { flex-direction: column; }
+  .sidebar-label { display: none; }
+  .sidebar-section { padding: 0; }
+  .sidebar-btn { padding: 6px 10px; font-size: 12px; }
+  .main-content { padding: 16px; }
+  .form-grid.cols-3, .form-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .form-group.span3, .form-group.span4 { grid-column: span 2; }
+}
+</style>
+</head>
+<body>
+
+<div class="notion-tip">
+  💡 Notionへの埋め込み方法: このHTMLファイルをGitHub Pages等で公開し、NotionページでURLを貼り付け → <strong>「埋め込みを作成」</strong>を選択
+</div>
+
+<div class="app-header">
+  <div class="logo">
+    🌿 日下農園
+    <span class="logo-badge">JGAP</span>
+    記録管理システム
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</div>
+
+<div class="app-body">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">ダッシュボード</div>
+      <button class="sidebar-btn active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <span class="icon">📊</span> ホーム
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">記録</div>
+      <button class="sidebar-btn" onclick="showPage('bojo')" id="nav-bojo">
+        <span class="icon">🌿</span> 防除実績
+      </button>
+      <button class="sidebar-btn" onclick="showPage('shihi')" id="nav-shihi">
+        <span class="icon">🌱</span> 施肥実績
+      </button>
+      <button class="sidebar-btn" onclick="showPage('harvest')" id="nav-harvest">
+        <span class="icon">🍊</span> 収穫実績
+      </button>
+      <button class="sidebar-btn" onclick="showPage('teki')" id="nav-teki">
+        <span class="icon">✂️</span> 摘果記録
+      </button>
+      <button class="sidebar-btn" onclick="showPage('diary')" id="nav-diary">
+        <span class="icon">📝</span> 日報
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">在庫管理</div>
+      <button class="sidebar-btn" onclick="showPage('inventory')" id="nav-inventory">
+        <span class="icon">📦</span> 農薬・肥料在庫
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">設定</div>
+      <button class="sidebar-btn" onclick="showPage('settings')" id="nav-settings">
+        <span class="icon">⚙️</span> 園地・資材設定
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📊 ダッシュボード</div>
+          <div class="page-subtitle">日下農園 JGAP記録管理システム</div>
+        </div>
+      </div>
+
+      <div class="stat-grid" id="dashStats"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div class="card">
+          <div class="card-title">⚠️ 在庫アラート</div>
+          <div id="inventoryAlerts"><div style="color:var(--text3);font-size:13px;">在庫データを入力すると表示されます</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 直近の記録</div>
+          <div id="recentRecords"><div style="color:var(--text3);font-size:13px;">記録を入力すると表示されます</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 防除実績 ── -->
+    <div class="page" id="page-bojo">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🌿 防除実績（農薬使用記録）</div>
+          <div class="page-subtitle">JGAP基準 A5.2 ｜ 農薬の使用記録</div>
+        </div>
+        <button class="btn btn-citrus" onclick="openBojoForm()">＋ 新規記録</button>
+      </div>
+
+      <!-- フォーム -->
+      <div class="card" id="bojoForm" style="display:none; border-left: 3px solid var(--accent-citrus);">
+        <div class="card-title">🌿 防除記録 入力</div>
+        <div class="form-grid cols-4">
+          <div class="form-group">
+            <label>実施日 <span class="required">*</span></label>
+            <input type="date" id="bojo_date">
+          </div>
+          <div class="form-group">
+            <label>園地 <span class="required">*</span></label>
+            <select id="bojo_garden"><option value="">選択</option></select>
+          </div>
+          <div class="form-group">
+            <label>作物</label>
+            <input type="text" id="bojo_crop" placeholder="例: 温州ミカン">
+          </div>
+          <div class="form-group">
+            <label>作業者</label>
+            <input type="text" id="bojo_worker" placeholder="氏名">
+          </div>
+          <div class="form-group span2">
+            <label>農薬名（登録番号） <span class="required">*</span></label>
+            <select id="bojo_pesticide"><option value="">選択 / 直接入力</option></select>
+          </div>
+          <div class="form-group">
+            <label>希釈倍率</label>
+            <input type="text" id="bojo_dilution" placeholder="例: 1000倍">
+          </div>
+          <div class="form-group">
+            <label>使用量（ml/L/g）<span class="required">*</span></label>
+            <input type="number" id="bojo_amount" step="0.1" placeholder="例: 237.5">
+          </div>
+          <div class="form-group">
+            <label>単位</label>
+            <select id="bojo_unit">
+              <option>mL</option><option>L</option><option>g</option><option>kg</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>容器内残量</label>
+            <input type="number" id="bojo_remain" step="0.1" placeholder="使用後の残量">
+          </div>
+          <div class="form-group">
+            <label>収穫予定日</label>
+            <input type="date" id="bojo_harvest_date">
+          </div>
+          <div class="form-group">
+            <label>PHI確認（前日数）</label>
+            <input type="number" id="bojo_phi" placeholder="例: 7">
+          </div>
+          <div class="form-group span4">
+            <label>備考</label>
+            <textarea id="bojo_note" rows="2" placeholder="天候・散布方法・特記事項など"></textarea>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn btn-citrus" onclick="saveBojo()">💾 保存</button>
+          <button class="btn btn-ghost" onclick="closeBojoForm()">キャンセル</button>
+        </div>
+      </div>
+
+      <div class="alert alert-warn" style="display:none" id="bojoAlert"></div>
+
+      <!-- テーブル -->
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+          <span class="section-title">記録一覧</span>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="bojoFilterGarden" onchange="renderBojoTable()" style="width:auto; padding:5px 8px; font-size:12px;">
+              <option value="">全園地</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV('bojo')">📥 CSV出力</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="bojoTable">
+            <thead><tr>
+              <th>実施日</th><th>園地</th><th>作物</th><th>農薬名</th>
+              <th>希釈</th><th>使用量</th><th>残量</th><th>PHI</th>
+              <th>収穫予定</th><th>作業者</th><th></th>
+            </tr></thead>
+            <tbody id="bojoTbody"><tr class="empty-row"><td colspan="11">記録がありません</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 施肥実績 ── -->
+    <div class="page" id="page-shihi">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🌱 施肥実績（肥料使用記録）</div>
+          <div class="page-subtitle">JGAP基準 A4.1 ｜ 肥料・土壌改良資材の使用記録</div>
+        </div>
+        <button class="btn btn-citrus" onclick="openShihiForm()">＋ 新規記録</button>
+      </div>
+
+      <div class="card" id="shihiForm" style="display:none; border-left: 3px solid var(--accent-green);">
+        <div class="card-title">🌱 施肥記録 入力</div>
+        <div class="form-grid cols-4">
+          <div class="form-group">
+            <label>実施日 <span class="required">*</span></label>
+            <input type="date" id="shihi_date">
+          </div>
+          <div class="form-group">
+            <label>園地 <span class="required">*</span></label>
+            <select id="shihi_garden"><option value="">選択</option></select>
+          </div>
+          <div class="form-group">
+            <label>作物</label>
+            <input type="text" id="shihi_crop" placeholder="例: 温州ミカン">
+          </div>
+          <div class="form-group">
+            <label>作業者</label>
+            <input type="text" id="shihi_worker" placeholder="氏名">
+          </div>
+          <div class="form-group span2">
+            <label>資材名 <span class="required">*</span></label>
+            <select id="shihi_material"><option value="">選択</option></select>
+          </div>
+          <div class="form-group">
+            <label>成分（N-P-K等）</label>
+            <input type="text" id="shihi_npk" placeholder="例: 8-8-8">
+          </div>
+          <div class="form-group">
+            <label>施肥面積（a）</label>
+            <input type="number" id="shihi_area" step="0.1" placeholder="例: 10.5">
+          </div>
+          <div class="form-group">
+            <label>使用量 <span class="required">*</span></label>
+            <input type="number" id="shihi_amount" step="0.01" placeholder="例: 7.5">
+          </div>
+          <div class="form-group">
+            <label>単位</label>
+            <select id="shihi_unit">
+              <option>kg</option><option>g</option><option>L</option><option>袋</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>10a当たり施肥量</label>
+            <input type="text" id="shihi_per10a" readonly placeholder="自動計算" style="background:var(--surface2); color:var(--accent-blue);">
+          </div>
+          <div class="form-group span4">
+            <label>備考</label>
+            <textarea id="shihi_note" rows="2" placeholder="施肥方法・土壌状態など"></textarea>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn btn-citrus" onclick="saveShibi()">💾 保存</button>
+          <button class="btn btn-ghost" onclick="closeShihiForm()">キャンセル</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+          <span class="section-title">記録一覧</span>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="shihiFilterGarden" onchange="renderShihiTable()" style="width:auto; padding:5px 8px; font-size:12px;">
+              <option value="">全園地</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV('shihi')">📥 CSV出力</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="shihiTable">
+            <thead><tr>
+              <th>実施日</th><th>園地</th><th>作物</th><th>資材名</th>
+              <th>成分</th><th>面積(a)</th><th>使用量</th><th>10a当量</th><th>作業者</th><th></th>
+            </tr></thead>
+            <tbody id="shihiTbody"><tr class="empty-row"><td colspan="10">記録がありません</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 収穫実績 ── -->
+    <div class="page" id="page-harvest">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🍊 収穫実績</div>
+          <div class="page-subtitle">JGAP基準 E1.1 ｜ トレーサビリティ確保</div>
+        </div>
+        <button class="btn btn-citrus" onclick="openHarvestForm()">＋ 新規記録</button>
+      </div>
+
+      <div class="card" id="harvestForm" style="display:none; border-left:3px solid var(--accent-citrus);">
+        <div class="card-title">🍊 収穫記録 入力</div>
+        <div class="form-grid cols-4">
+          <div class="form-group">
+            <label>収穫日 <span class="required">*</span></label>
+            <input type="date" id="hv_date">
+          </div>
+          <div class="form-group">
+            <label>園地 <span class="required">*</span></label>
+            <select id="hv_garden"><option value="">選択</option></select>
+          </div>
+          <div class="form-group">
+            <label>作物・品種 <span class="required">*</span></label>
+            <input type="text" id="hv_crop" placeholder="例: 温州ミカン 宮川早生">
+          </div>
+          <div class="form-group">
+            <label>ロットNo.</label>
+            <input type="text" id="hv_lot" placeholder="自動生成可">
+          </div>
+          <div class="form-group">
+            <label>収穫量（kg）<span class="required">*</span></label>
+            <input type="number" id="hv_amount" step="0.1" placeholder="例: 125.5">
+          </div>
+          <div class="form-group">
+            <label>出荷日</label>
+            <input type="date" id="hv_ship_date">
+          </div>
+          <div class="form-group">
+            <label>出荷先</label>
+            <input type="text" id="hv_dest" placeholder="例: JA○○選果場">
+          </div>
+          <div class="form-group">
+            <label>出荷量（kg）</label>
+            <input type="number" id="hv_ship_amount" step="0.1" placeholder="例: 120.0">
+          </div>
+          <div class="form-group">
+            <label>作業者</label>
+            <input type="text" id="hv_worker">
+          </div>
+          <div class="form-group span3">
+            <label>備考</label>
+            <textarea id="hv_note" rows="2" placeholder="品質・天候・特記事項"></textarea>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn btn-citrus" onclick="saveHarvest()">💾 保存</button>
+          <button class="btn btn-ghost" onclick="closeHarvestForm()">キャンセル</button>
+        </div>
+      </div>
+
+      <div class="stat-grid" id="harvestStats"></div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+          <span class="section-title">記録一覧</span>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <select id="hvFilterGarden" onchange="renderHarvestTable()" style="width:auto; padding:5px 8px; font-size:12px;">
+              <option value="">全園地</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV('harvest')">📥 CSV出力</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>収穫日</th><th>園地</th><th>作物・品種</th><th>ロットNo.</th>
+              <th>収穫量(kg)</th><th>出荷日</th><th>出荷先</th><th>出荷量(kg)</th><th>作業者</th><th></th>
+            </tr></thead>
+            <tbody id="harvestTbody"><tr class="empty-row"><td colspan="10">記録がありません</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 摘果記録 ── -->
+    <div class="page" id="page-teki">
+      <div class="page-header">
+        <div>
+          <div class="page-title">✂️ 摘果記録</div>
+          <div class="page-subtitle">園地ごとの摘果作業記録</div>
+        </div>
+        <button class="btn btn-citrus" onclick="openTekiForm()">＋ 新規記録</button>
+      </div>
+
+      <div class="card" id="tekiForm" style="display:none; border-left:3px solid var(--accent-berry);">
+        <div class="card-title">✂️ 摘果記録 入力</div>
+        <div class="form-grid cols-4">
+          <div class="form-group">
+            <label>実施日 <span class="required">*</span></label>
+            <input type="date" id="tk_date">
+          </div>
+          <div class="form-group">
+            <label>園地 <span class="required">*</span></label>
+            <select id="tk_garden"><option value="">選択</option></select>
+          </div>
+          <div class="form-group">
+            <label>作物・品種</label>
+            <input type="text" id="tk_crop" placeholder="例: 温州ミカン">
+          </div>
+          <div class="form-group">
+            <label>作業者</label>
+            <input type="text" id="tk_worker">
+          </div>
+          <div class="form-group">
+            <label>摘果率（%）</label>
+            <input type="number" id="tk_rate" step="0.1" min="0" max="100" placeholder="例: 30">
+          </div>
+          <div class="form-group">
+            <label>作業時間（h）</label>
+            <input type="number" id="tk_hours" step="0.5" placeholder="例: 4.5">
+          </div>
+          <div class="form-group">
+            <label>作業面積（a）</label>
+            <input type="number" id="tk_area" step="0.1" placeholder="例: 5.0">
+          </div>
+          <div class="form-group">
+            <label>摘果数（個/本）</label>
+            <input type="text" id="tk_count" placeholder="例: 約500">
+          </div>
+          <div class="form-group span4">
+            <label>備考</label>
+            <textarea id="tk_note" rows="2" placeholder="摘果方法・樹の状態など"></textarea>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn btn-citrus" onclick="saveTeki()">💾 保存</button>
+          <button class="btn btn-ghost" onclick="closeTekiForm()">キャンセル</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+          <span class="section-title">記録一覧</span>
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV('teki')">📥 CSV出力</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>実施日</th><th>園地</th><th>作物</th><th>摘果率(%)</th>
+              <th>面積(a)</th><th>作業時間(h)</th><th>摘果数</th><th>作業者</th><th></th>
+            </tr></thead>
+            <tbody id="tekiTbody"><tr class="empty-row"><td colspan="9">記録がありません</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 日報 ── -->
+    <div class="page" id="page-diary">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📝 日報</div>
+          <div class="page-subtitle">日々の農場作業記録</div>
+        </div>
+        <button class="btn btn-citrus" onclick="openDiaryForm()">＋ 新規日報</button>
+      </div>
+
+      <div class="card" id="diaryForm" style="display:none; border-left:3px solid var(--accent-blue);">
+        <div class="card-title">📝 日報 入力</div>
+        <div class="form-grid cols-4">
+          <div class="form-group">
+            <label>日付 <span class="required">*</span></label>
+            <input type="date" id="dr_date">
+          </div>
+          <div class="form-group">
+            <label>天気</label>
+            <select id="dr_weather">
+              <option>☀️ 晴</option><option>⛅ 曇</option><option>🌧️ 雨</option>
+              <option>🌩️ 雷雨</option><option>❄️ 雪</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>気温（℃）</label>
+            <input type="number" id="dr_temp" step="0.1" placeholder="例: 18.5">
+          </div>
+          <div class="form-group">
+            <label>作業者</label>
+            <input type="text" id="dr_worker" placeholder="記録者名">
+          </div>
+          <div class="form-group span2">
+            <label>作業した園地</label>
+            <input type="text" id="dr_gardens_text" placeholder="例: A-1, B-2（複数可）">
+          </div>
+          <div class="form-group span2">
+            <label>主な作業内容</label>
+            <input type="text" id="dr_work" placeholder="例: 摘果・防除・草刈り">
+          </div>
+          <div class="form-group span4">
+            <label>作業詳細・所見</label>
+            <textarea id="dr_detail" rows="3" placeholder="作業の詳細、気づいた点、病害虫の状況など"></textarea>
+          </div>
+          <div class="form-group span2">
+            <label>翌日の作業予定</label>
+            <textarea id="dr_next" rows="2" placeholder="明日の予定作業"></textarea>
+          </div>
+          <div class="form-group span2">
+            <label>課題・改善点</label>
+            <textarea id="dr_issue" rows="2" placeholder="問題点・改善したい点"></textarea>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn btn-citrus" onclick="saveDiary()">💾 保存</button>
+          <button class="btn btn-ghost" onclick="closeDiaryForm()">キャンセル</button>
+        </div>
+      </div>
+
+      <div id="diaryList"></div>
+    </div>
+
+    <!-- ── 在庫管理 ── -->
+    <div class="page" id="page-inventory">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📦 農薬・肥料在庫管理</div>
+          <div class="page-subtitle">在庫は防除・施肥の記録と連動して自動更新</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchInvTab('pesticide', this)">🌿 農薬</button>
+        <button class="tab-btn" onclick="switchInvTab('fertilizer', this)">🌱 肥料・土壌改良資材</button>
+        <button class="tab-btn" onclick="switchInvTab('invIn', this)">📥 入荷記録</button>
+      </div>
+
+      <!-- 農薬在庫 -->
+      <div class="tab-pane active" id="tab-pesticide">
+        <div class="section-header">
+          <span class="section-title">農薬マスタ・在庫一覧</span>
+          <button class="btn btn-sm btn-ghost" onclick="openAddPesticide()">＋ 農薬登録</button>
+        </div>
+        <div class="card" id="addPesticideForm" style="display:none; border-left:3px solid var(--accent-citrus); margin-bottom:12px;">
+          <div class="card-title">農薬 登録</div>
+          <div class="form-grid cols-4">
+            <div class="form-group"><label>農薬ID</label><input type="text" id="pi_id" placeholder="例: P001"></div>
+            <div class="form-group span2"><label>農薬名</label><input type="text" id="pi_name" placeholder="例: ○○殺虫剤A"></div>
+            <div class="form-group"><label>登録番号</label><input type="text" id="pi_reg" placeholder="例: 第12345号"></div>
+            <div class="form-group"><label>メーカー</label><input type="text" id="pi_maker"></div>
+            <div class="form-group"><label>規格</label><input type="text" id="pi_size" placeholder="例: 500mL/本"></div>
+            <div class="form-group"><label>単位</label>
+              <select id="pi_unit"><option>mL</option><option>L</option><option>g</option><option>kg</option></select>
+            </div>
+            <div class="form-group"><label>安全在庫数</label><input type="number" id="pi_safe" step="0.1"></div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn btn-citrus btn-sm" onclick="savePesticideMaster()">登録</button>
+            <button class="btn btn-ghost btn-sm" onclick="closeAddPesticide()">キャンセル</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>農薬名</th><th>登録番号</th><th>規格</th><th>単位</th><th>安全在庫</th><th>入荷累計</th><th>使用累計</th><th>現在在庫</th><th>状態</th><th></th></tr></thead>
+            <tbody id="pesticideTbody"><tr class="empty-row"><td colspan="11">農薬を登録してください</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 肥料在庫 -->
+      <div class="tab-pane" id="tab-fertilizer">
+        <div class="section-header">
+          <span class="section-title">肥料・土壌改良資材 マスタ・在庫一覧</span>
+          <button class="btn btn-sm btn-ghost" onclick="openAddFertilizer()">＋ 資材登録</button>
+        </div>
+        <div class="card" id="addFertilizerForm" style="display:none; border-left:3px solid var(--accent-green); margin-bottom:12px;">
+          <div class="card-title">肥料・資材 登録</div>
+          <div class="form-grid cols-4">
+            <div class="form-group"><label>資材ID</label><input type="text" id="fi_id" placeholder="例: F001"></div>
+            <div class="form-group span2"><label>資材名</label><input type="text" id="fi_name"></div>
+            <div class="form-group"><label>メーカー</label><input type="text" id="fi_maker"></div>
+            <div class="form-group"><label>成分(N-P-K等)</label><input type="text" id="fi_npk" placeholder="例: 8-8-8"></div>
+            <div class="form-group"><label>規格</label><input type="text" id="fi_size" placeholder="例: 20kg/袋"></div>
+            <div class="form-group"><label>単位</label>
+              <select id="fi_unit"><option>kg</option><option>g</option><option>L</option><option>袋</option></select>
+            </div>
+            <div class="form-group"><label>安全在庫数</label><input type="number" id="fi_safe" step="0.1"></div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn btn-citrus btn-sm" onclick="saveFertilizerMaster()">登録</button>
+            <button class="btn btn-ghost btn-sm" onclick="closeAddFertilizer()">キャンセル</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>資材名</th><th>成分</th><th>規格</th><th>単位</th><th>安全在庫</th><th>入荷累計</th><th>使用累計</th><th>現在在庫</th><th>状態</th><th></th></tr></thead>
+            <tbody id="fertilizerTbody"><tr class="empty-row"><td colspan="11">資材を登録してください</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 入荷記録 -->
+      <div class="tab-pane" id="tab-invIn">
+        <div class="section-header">
+          <span class="section-title">入荷記録</span>
+          <button class="btn btn-sm btn-ghost" onclick="openInvInForm()">＋ 入荷追加</button>
+        </div>
+        <div class="card" id="invInForm" style="display:none; margin-bottom:12px;">
+          <div class="card-title">入荷記録 入力</div>
+          <div class="form-grid cols-4">
+            <div class="form-group"><label>入荷日</label><input type="date" id="ii_date"></div>
+            <div class="form-group"><label>種類</label>
+              <select id="ii_type" onchange="updateInvInSelect()">
+                <option value="pesticide">農薬</option><option value="fertilizer">肥料・資材</option>
+              </select>
+            </div>
+            <div class="form-group span2"><label>資材名</label><select id="ii_item"><option value="">選択</option></select></div>
+            <div class="form-group"><label>入荷数量（半端OK）</label><input type="number" id="ii_amount" step="0.01" placeholder="例: 350.5"></div>
+            <div class="form-group"><label>単位（自動）</label><input type="text" id="ii_unit" readonly style="background:var(--surface2)"></div>
+            <div class="form-group"><label>仕入先</label><input type="text" id="ii_supplier"></div>
+            <div class="form-group"><label>備考（ロット番号等）</label><input type="text" id="ii_note"></div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button class="btn btn-citrus btn-sm" onclick="saveInvIn()">💾 保存</button>
+            <button class="btn btn-ghost btn-sm" onclick="closeInvInForm()">キャンセル</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>入荷日</th><th>種類</th><th>資材名</th><th>入荷数量</th><th>単位</th><th>仕入先</th><th>備考</th><th></th></tr></thead>
+            <tbody id="invInTbody"><tr class="empty-row"><td colspan="8">入荷記録がありません</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 設定 ── -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">⚙️ 園地・設定</div>
+          <div class="page-subtitle">園地の登録と管理</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌿 園地登録</div>
+        <div class="form-grid cols-4" style="margin-bottom:12px;">
+          <div class="form-group"><label>園地コード</label><input type="text" id="gd_code" placeholder="例: A-1"></div>
+          <div class="form-group span2"><label>園地名</label><input type="text" id="gd_name" placeholder="例: 本圃南側"></div>
+          <div class="form-group">
+            <label>種類</label>
+            <select id="gd_type">
+              <option value="citrus">柑橘</option>
+              <option value="blueberry">ブルーベリー</option>
+              <option value="other">その他</option>
+            </select>
+          </div>
+          <div class="form-group"><label>面積（a）</label><input type="number" id="gd_area" step="0.1"></div>
+          <div class="form-group"><label>主要品種</label><input type="text" id="gd_variety" placeholder="例: 宮川早生"></div>
+          <div class="form-group"><label>備考</label><input type="text" id="gd_note"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="saveGarden()">＋ 園地を追加</button>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:14px 16px; border-bottom:1px solid var(--border);">
+          <span class="section-title">登録済み園地一覧</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>コード</th><th>園地名</th><th>種類</th><th>面積(a)</th><th>主要品種</th><th>備考</th><th></th></tr></thead>
+            <tbody id="gardenTbody"><tr class="empty-row"><td colspan="7">園地を登録してください</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:8px;">
+        <div class="card-title">💾 データ管理</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="exportAllData()">📤 全データエクスポート(JSON)</button>
+          <button class="btn btn-ghost btn-sm" onclick="importData()">📥 データインポート</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="doImport(event)">
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">🗑️ 全データ削除</button>
+        </div>
+        <div style="font-size:11px; color:var(--text3); margin-top:8px;">※ データはこのブラウザのローカルストレージに保存されます。エクスポートして定期的にバックアップしてください。</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DATA STORE
+// ══════════════════════════════════════════════════════════
+const KEYS = {
+  gardens:'jgap_gardens', bojoRecords:'jgap_bojo', shihiRecords:'jgap_shihi',
+  harvestRecords:'jgap_harvest', tekiRecords:'jgap_teki', diaryRecords:'jgap_diary',
+  pesticideMaster:'jgap_pesticide_master', fertilizerMaster:'jgap_fertilizer_master',
+  invInRecords:'jgap_inv_in'
+};
+
+function load(key){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){return [];} }
+function save(key,data){ localStorage.setItem(key, JSON.stringify(data)); }
+
+function getData(key){ return load(KEYS[key]); }
+function setData(key,data){ save(KEYS[key],data); }
+function addData(key,item){ const d=getData(key); d.unshift(item); setData(key,d); }
+
+// ══════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='dashboard') updateDashboard();
+  if(name==='inventory') { renderPesticideTable(); renderFertilizerTable(); renderInvInTable(); }
+  if(name==='settings') renderGardenTable();
+  if(name==='bojo'){ populateGardenSelects(); renderBojoTable(); }
+  if(name==='shihi'){ populateGardenSelects(); renderShihiTable(); }
+  if(name==='harvest'){ populateGardenSelects(); renderHarvestTable(); updateHarvestStats(); }
+  if(name==='teki'){ populateGardenSelects(); renderTekiTable(); }
+  if(name==='diary'){ renderDiaryList(); }
+}
+
+// ══════════════════════════════════════════════════════════
+// HEADER DATE
+// ══════════════════════════════════════════════════════════
+(function(){
+  const d=new Date();
+  document.getElementById('headerDate').textContent=
+    d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日（'+['日','月','火','水','木','金','土'][d.getDay()]+'）';
+})();
+
+// ══════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function fmtDate(s){ if(!s)return '—'; const d=new Date(s); return (d.getMonth()+1)+'/'+d.getDate(); }
+function fmtNum(n,dec=1){ if(n===''||n===null||n===undefined)return '—'; return parseFloat(n).toFixed(dec); }
+
+function statusBadge(current, safe){
+  const c = parseFloat(current), s = parseFloat(safe);
+  if(isNaN(c)) return '<span class="badge badge-gray">—</span>';
+  if(c <= 0) return '<span class="badge badge-red">❌ 在庫なし</span>';
+  if(!isNaN(s) && c < s) return '<span class="badge badge-citrus">⚠️ 要補充</span>';
+  return '<span class="badge badge-green">✅ 適正</span>';
+}
+
+function gardenTypeBadge(type){
+  if(type==='citrus') return '<span class="badge badge-citrus">🍊 柑橘</span>';
+  if(type==='blueberry') return '<span class="badge badge-berry">🫐 ブルーベリー</span>';
+  return '<span class="badge badge-gray">その他</span>';
+}
+
+// ══════════════════════════════════════════════════════════
+// GARDEN SELECTS
+// ══════════════════════════════════════════════════════════
+function populateGardenSelects(){
+  const gardens = getData('gardens');
+  const opts = '<option value="">選択してください</option>' +
+    gardens.map(g=>`<option value="${g.code}">${g.code} ${g.name}</option>`).join('');
+  const filterOpts = '<option value="">全園地</option>' +
+    gardens.map(g=>`<option value="${g.code}">${g.code} ${g.name}</option>`).join('');
+  ['bojo_garden','shihi_garden','hv_garden','tk_garden'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=opts;
+  });
+  ['bojoFilterGarden','shihiFilterGarden','hvFilterGarden'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=filterOpts;
+  });
+  // pesticide selects
+  const pests = getData('pesticideMaster');
+  const pestOpts = '<option value="">選択</option>'+pests.map(p=>`<option value="${p.id}" data-unit="${p.unit}">${p.name}（${p.id}）</option>`).join('');
+  const bojoP = document.getElementById('bojo_pesticide');
+  if(bojoP) bojoP.innerHTML = pestOpts;
+  // fertilizer selects
+  const ferts = getData('fertilizerMaster');
+  const fertOpts = '<option value="">選択</option>'+ferts.map(f=>`<option value="${f.id}">${f.name}（${f.id}）</option>`).join('');
+  const shihiM = document.getElementById('shihi_material');
+  if(shihiM) shihiM.innerHTML = fertOpts;
+}
+
+// ══════════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════════
+function updateDashboard(){
+  const bojo=getData('bojoRecords'), shihi=getData('shihiRecords');
+  const harvest=getData('harvestRecords'), gardens=getData('gardens');
+  const totalHarvest = harvest.reduce((s,r)=>s+parseFloat(r.amount||0),0);
+
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">登録園地数</div>
+      <div class="stat-value">${gardens.length}</div>
+      <div class="stat-unit">か所</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">防除記録（今年）</div>
+      <div class="stat-value">${bojo.filter(r=>r.date&&r.date.startsWith(new Date().getFullYear())).length}</div>
+      <div class="stat-unit">件</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">施肥記録（今年）</div>
+      <div class="stat-value">${shihi.filter(r=>r.date&&r.date.startsWith(new Date().getFullYear())).length}</div>
+      <div class="stat-unit">件</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">収穫累計（今年）</div>
+      <div class="stat-value">${totalHarvest.toFixed(1)}</div>
+      <div class="stat-unit">kg</div>
+    </div>
+  `;
+
+  // アラート
+  const pests=getData('pesticideMaster'), ferts=getData('fertilizerMaster');
+  const invIn=getData('invInRecords');
+  let alerts='';
+  [...pests,...ferts].forEach(item=>{
+    const inType = item.id.startsWith('F')||item.id.startsWith('f') ? 'fertilizer' : 'pesticide';
+    const inTotal = invIn.filter(r=>r.type===inType&&r.itemId===item.id).reduce((s,r)=>s+parseFloat(r.amount||0),0);
+    const useRecords = inType==='pesticide' ? getData('bojoRecords') : getData('shihiRecords');
+    const usedTotal = useRecords.filter(r=>{
+      const id = inType==='pesticide' ? r.pesticide_id : r.material_id;
+      return id===item.id;
+    }).reduce((s,r)=>s+parseFloat(r.amount||0),0);
+    const curr = inTotal - usedTotal;
+    if(curr <= 0) alerts += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;"><span class="badge badge-red">❌ 在庫なし</span><span>${item.name}</span></div>`;
+    else if(item.safe && curr < parseFloat(item.safe)) alerts += `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;"><span class="badge badge-citrus">⚠️ 要補充</span><span>${item.name} (残${curr.toFixed(1)}${item.unit})</span></div>`;
+  });
+  document.getElementById('inventoryAlerts').innerHTML = alerts || '<div style="color:var(--text3);font-size:13px;">アラートなし</div>';
+
+  // 直近記録
+  const allRecords = [
+    ...bojo.slice(0,3).map(r=>({date:r.date, type:'🌿 防除', detail:r.pesticide_name||'—', garden:r.garden})),
+    ...shihi.slice(0,3).map(r=>({date:r.date, type:'🌱 施肥', detail:r.material_name||'—', garden:r.garden})),
+    ...harvest.slice(0,3).map(r=>({date:r.date, type:'🍊 収穫', detail:r.crop+'  '+r.amount+'kg', garden:r.garden})),
+  ].sort((a,b)=>b.date>a.date?1:-1).slice(0,6);
+  document.getElementById('recentRecords').innerHTML = allRecords.length ?
+    allRecords.map(r=>`<div style="display:flex;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;">
+      <span style="color:var(--text3);font-family:'DM Mono',monospace;font-size:11px;">${fmtDate(r.date)}</span>
+      <span>${r.type}</span>
+      <span style="color:var(--text2);">${r.garden||''}</span>
+      <span style="color:var(--text3);">${r.detail}</span>
+    </div>`).join('') :
+    '<div style="color:var(--text3);font-size:13px;">記録がありません</div>';
+}
+
+// ══════════════════════════════════════════════════════════
+// 防除
+// ══════════════════════════════════════════════════════════
+function openBojoForm(){ 
+  populateGardenSelects();
+  document.getElementById('bojoForm').style.display='block';
+  document.getElementById('bojo_date').value=today();
+}
+function closeBojoForm(){ document.getElementById('bojoForm').style.display='none'; }
+
+function saveBojo(){
+  const date=document.getElementById('bojo_date').value;
+  const garden=document.getElementById('bojo_garden').value;
+  const pestSel=document.getElementById('bojo_pesticide');
+  const pestName=pestSel.options[pestSel.selectedIndex]?.text||'';
+  const pestId=pestSel.value;
+  const amount=document.getElementById('bojo_amount').value;
+  if(!date||!garden||!amount){ showAlert('bojoAlert','実施日・園地・使用量は必須です'); return; }
+  const record={
+    id:uid(), date, garden,
+    crop:document.getElementById('bojo_crop').value,
+    pesticide_id:pestId,
+    pesticide_name:pestName.replace(/（.*）/,'').trim(),
+    dilution:document.getElementById('bojo_dilution').value,
+    amount:parseFloat(amount),
+    unit:document.getElementById('bojo_unit').value,
+    remain:document.getElementById('bojo_remain').value,
+    phi:document.getElementById('bojo_phi').value,
+    harvest_date:document.getElementById('bojo_harvest_date').value,
+    worker:document.getElementById('bojo_worker').value,
+    note:document.getElementById('bojo_note').value
+  };
+  addData('bojoRecords',record);
+  closeBojoForm();
+  renderBojoTable();
+  clearForm(['bojo_garden','bojo_crop','bojo_pesticide','bojo_dilution','bojo_amount','bojo_remain','bojo_phi','bojo_harvest_date','bojo_worker','bojo_note']);
+}
+
+function renderBojoTable(){
+  const records=getData('bojoRecords');
+  const filter=document.getElementById('bojoFilterGarden')?.value||'';
+  const filtered=filter?records.filter(r=>r.garden===filter):records;
+  const tbody=document.getElementById('bojoTbody');
+  if(!filtered.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="11">記録がありません</td></tr>'; return; }
+  tbody.innerHTML=filtered.map(r=>`<tr>
+    <td><span class="mono">${r.date}</span></td>
+    <td><span class="badge badge-gray">${r.garden}</span></td>
+    <td>${r.crop||'—'}</td>
+    <td>${r.pesticide_name||'—'}</td>
+    <td>${r.dilution||'—'}</td>
+    <td><strong class="mono">${r.amount}</strong> ${r.unit}</td>
+    <td>${r.remain?r.remain+' '+r.unit:'—'}</td>
+    <td>${r.phi?r.phi+'日':'—'}</td>
+    <td>${r.harvest_date?fmtDate(r.harvest_date):'—'}</td>
+    <td>${r.worker||'—'}</td>
+    <td><button class="del-btn" onclick="deleteRecord('bojoRecords','${r.id}',renderBojoTable)">🗑</button></td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// 施肥
+// ══════════════════════════════════════════════════════════
+function openShihiForm(){ 
+  populateGardenSelects();
+  document.getElementById('shihiForm').style.display='block';
+  document.getElementById('shihi_date').value=today();
+}
+function closeShihiForm(){ document.getElementById('shihiForm').style.display='none'; }
+
+document.getElementById('shihi_amount').addEventListener('input', calcPer10a);
+document.getElementById('shihi_area').addEventListener('input', calcPer10a);
+function calcPer10a(){
+  const amt=parseFloat(document.getElementById('shihi_amount').value);
+  const area=parseFloat(document.getElementById('shihi_area').value);
+  const el=document.getElementById('shihi_per10a');
+  if(!isNaN(amt)&&!isNaN(area)&&area>0) el.value=(amt/area*10).toFixed(2)+' /10a';
+  else el.value='';
+}
+
+function saveShibi(){
+  const date=document.getElementById('shihi_date').value;
+  const garden=document.getElementById('shihi_garden').value;
+  const matSel=document.getElementById('shihi_material');
+  const matName=matSel.options[matSel.selectedIndex]?.text||'';
+  const matId=matSel.value;
+  const amount=document.getElementById('shihi_amount').value;
+  if(!date||!garden||!amount){ showAlert('shihiAlert','実施日・園地・使用量は必須です'); return; }
+  const area=parseFloat(document.getElementById('shihi_area').value)||0;
+  const per10a=area>0?(parseFloat(amount)/area*10).toFixed(2)+'/10a':'—';
+  const record={
+    id:uid(), date, garden,
+    crop:document.getElementById('shihi_crop').value,
+    material_id:matId,
+    material_name:matName.replace(/（.*）/,'').trim(),
+    npk:document.getElementById('shihi_npk').value,
+    area, amount:parseFloat(amount),
+    unit:document.getElementById('shihi_unit').value,
+    per10a,
+    worker:document.getElementById('shihi_worker').value,
+    note:document.getElementById('shihi_note').value
+  };
+  addData('shihiRecords',record);
+  closeShihiForm();
+  renderShihiTable();
+}
+
+function renderShihiTable(){
+  const records=getData('shihiRecords');
+  const filter=document.getElementById('shihiFilterGarden')?.value||'';
+  const filtered=filter?records.filter(r=>r.garden===filter):records;
+  const tbody=document.getElementById('shihiTbody');
+  if(!filtered.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="10">記録がありません</td></tr>'; return; }
+  tbody.innerHTML=filtered.map(r=>`<tr>
+    <td><span class="mono">${r.date}</span></td>
+    <td><span class="badge badge-gray">${r.garden}</span></td>
+    <td>${r.crop||'—'}</td>
+    <td>${r.material_name||r.material_id||'—'}</td>
+    <td>${r.npk||'—'}</td>
+    <td class="mono">${r.area||'—'}</td>
+    <td><strong class="mono">${r.amount}</strong> ${r.unit}</td>
+    <td class="mono">${r.per10a||'—'}</td>
+    <td>${r.worker||'—'}</td>
+    <td><button class="del-btn" onclick="deleteRecord('shihiRecords','${r.id}',renderShihiTable)">🗑</button></td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// 収穫
+// ══════════════════════════════════════════════════════════
+let lotCounter = 1;
+function openHarvestForm(){
+  populateGardenSelects();
+  document.getElementById('harvestForm').style.display='block';
+  document.getElementById('hv_date').value=today();
+  const year=new Date().getFullYear().toString().slice(2);
+  document.getElementById('hv_lot').value=`LOT-${year}-${String(lotCounter++).padStart(3,'0')}`;
+}
+function closeHarvestForm(){ document.getElementById('harvestForm').style.display='none'; }
+
+function saveHarvest(){
+  const date=document.getElementById('hv_date').value;
+  const garden=document.getElementById('hv_garden').value;
+  const crop=document.getElementById('hv_crop').value;
+  const amount=document.getElementById('hv_amount').value;
+  if(!date||!garden||!crop||!amount){ alert('収穫日・園地・作物・収穫量は必須です'); return; }
+  addData('harvestRecords',{
+    id:uid(), date, garden, crop,
+    lot:document.getElementById('hv_lot').value,
+    amount:parseFloat(amount),
+    ship_date:document.getElementById('hv_ship_date').value,
+    dest:document.getElementById('hv_dest').value,
+    ship_amount:document.getElementById('hv_ship_amount').value,
+    worker:document.getElementById('hv_worker').value,
+    note:document.getElementById('hv_note').value
+  });
+  closeHarvestForm();
+  renderHarvestTable();
+  updateHarvestStats();
+}
+
+function updateHarvestStats(){
+  const records=getData('harvestRecords');
+  const year=new Date().getFullYear();
+  const thisYear=records.filter(r=>r.date&&r.date.startsWith(year));
+  const total=thisYear.reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const shipped=thisYear.reduce((s,r)=>s+parseFloat(r.ship_amount||0),0);
+  document.getElementById('harvestStats').innerHTML=`
+    <div class="stat-card"><div class="stat-label">収穫累計（${year}年）</div><div class="stat-value">${total.toFixed(1)}</div><div class="stat-unit">kg</div></div>
+    <div class="stat-card"><div class="stat-label">出荷累計（${year}年）</div><div class="stat-value">${shipped.toFixed(1)}</div><div class="stat-unit">kg</div></div>
+    <div class="stat-card"><div class="stat-label">収穫件数</div><div class="stat-value">${thisYear.length}</div><div class="stat-unit">件</div></div>
+    <div class="stat-card"><div class="stat-label">自家消費・在庫</div><div class="stat-value">${(total-shipped).toFixed(1)}</div><div class="stat-unit">kg</div></div>
+  `;
+}
+
+function renderHarvestTable(){
+  const records=getData('harvestRecords');
+  const filter=document.getElementById('hvFilterGarden')?.value||'';
+  const filtered=filter?records.filter(r=>r.garden===filter):records;
+  const tbody=document.getElementById('harvestTbody');
+  if(!filtered.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="10">記録がありません</td></tr>'; return; }
+  tbody.innerHTML=filtered.map(r=>`<tr>
+    <td><span class="mono">${r.date}</span></td>
+    <td><span class="badge badge-gray">${r.garden}</span></td>
+    <td>${r.crop}</td>
+    <td><span class="mono" style="font-size:11px;">${r.lot||'—'}</span></td>
+    <td><strong class="mono">${r.amount}</strong> kg</td>
+    <td>${r.ship_date?fmtDate(r.ship_date):'—'}</td>
+    <td>${r.dest||'—'}</td>
+    <td>${r.ship_amount?r.ship_amount+' kg':'—'}</td>
+    <td>${r.worker||'—'}</td>
+    <td><button class="del-btn" onclick="deleteRecord('harvestRecords','${r.id}',()=>{renderHarvestTable();updateHarvestStats();})">🗑</button></td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// 摘果
+// ══════════════════════════════════════════════════════════
+function openTekiForm(){ 
+  populateGardenSelects();
+  document.getElementById('tekiForm').style.display='block';
+  document.getElementById('tk_date').value=today();
+}
+function closeTekiForm(){ document.getElementById('tekiForm').style.display='none'; }
+
+function saveTeki(){
+  const date=document.getElementById('tk_date').value;
+  const garden=document.getElementById('tk_garden').value;
+  if(!date||!garden){ alert('実施日・園地は必須です'); return; }
+  addData('tekiRecords',{
+    id:uid(), date, garden,
+    crop:document.getElementById('tk_crop').value,
+    rate:document.getElementById('tk_rate').value,
+    hours:document.getElementById('tk_hours').value,
+    area:document.getElementById('tk_area').value,
+    count:document.getElementById('tk_count').value,
+    worker:document.getElementById('tk_worker').value,
+    note:document.getElementById('tk_note').value
+  });
+  closeTekiForm();
+  renderTekiTable();
+}
+
+function renderTekiTable(){
+  const records=getData('tekiRecords');
+  const tbody=document.getElementById('tekiTbody');
+  if(!records.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="9">記録がありません</td></tr>'; return; }
+  tbody.innerHTML=records.map(r=>`<tr>
+    <td><span class="mono">${r.date}</span></td>
+    <td><span class="badge badge-gray">${r.garden}</span></td>
+    <td>${r.crop||'—'}</td>
+    <td class="mono">${r.rate?r.rate+'%':'—'}</td>
+    <td class="mono">${r.area||'—'}</td>
+    <td class="mono">${r.hours||'—'}</td>
+    <td>${r.count||'—'}</td>
+    <td>${r.worker||'—'}</td>
+    <td><button class="del-btn" onclick="deleteRecord('tekiRecords','${r.id}',renderTekiTable)">🗑</button></td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// 日報
+// ══════════════════════════════════════════════════════════
+function openDiaryForm(){
+  document.getElementById('diaryForm').style.display='block';
+  document.getElementById('dr_date').value=today();
+}
+function closeDiaryForm(){ document.getElementById('diaryForm').style.display='none'; }
+
+function saveDiary(){
+  const date=document.getElementById('dr_date').value;
+  if(!date){ alert('日付は必須です'); return; }
+  addData('diaryRecords',{
+    id:uid(), date,
+    weather:document.getElementById('dr_weather').value,
+    temp:document.getElementById('dr_temp').value,
+    worker:document.getElementById('dr_worker').value,
+    gardens:document.getElementById('dr_gardens_text').value,
+    work:document.getElementById('dr_work').value,
+    detail:document.getElementById('dr_detail').value,
+    next:document.getElementById('dr_next').value,
+    issue:document.getElementById('dr_issue').value
+  });
+  closeDiaryForm();
+  renderDiaryList();
+}
+
+function renderDiaryList(){
+  const records=getData('diaryRecords');
+  const el=document.getElementById('diaryList');
+  if(!records.length){ el.innerHTML='<div class="card" style="color:var(--text3);text-align:center;padding:32px;">日報がありません</div>'; return; }
+  el.innerHTML=records.map(r=>`<div class="card" style="margin-bottom:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-family:'DM Mono',monospace;font-weight:700;font-size:15px;">${r.date}</span>
+        <span>${r.weather}</span>
+        ${r.temp?`<span style="font-size:12px;color:var(--text2);">${r.temp}℃</span>`:''}
+        ${r.gardens?`<span class="badge badge-gray">${r.gardens}</span>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        ${r.worker?`<span style="font-size:12px;color:var(--text3);">👤 ${r.worker}</span>`:''}
+        <button class="del-btn" onclick="deleteRecord('diaryRecords','${r.id}',renderDiaryList)">🗑</button>
+      </div>
+    </div>
+    ${r.work?`<div style="font-weight:600;margin-bottom:6px;">📌 ${r.work}</div>`:''}
+    ${r.detail?`<div style="font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap;background:var(--bg);padding:10px;border-radius:6px;">${r.detail}</div>`:''}
+    ${(r.next||r.issue)?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+      ${r.next?`<div><div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:4px;">翌日の予定</div><div style="font-size:12px;">${r.next}</div></div>`:''}
+      ${r.issue?`<div><div style="font-size:11px;font-weight:700;color:var(--accent-red);margin-bottom:4px;">課題・改善点</div><div style="font-size:12px;">${r.issue}</div></div>`:''}
+    </div>`:''}
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// 在庫管理
+// ══════════════════════════════════════════════════════════
+function switchInvTab(name, btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function calcInvTotals(type, itemId){
+  const invIn=getData('invInRecords');
+  const inTotal=invIn.filter(r=>r.type===type&&r.itemId===itemId).reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  const useRecords = type==='pesticide' ? getData('bojoRecords') : getData('shihiRecords');
+  const usedTotal = useRecords.filter(r=>{
+    const id = type==='pesticide' ? r.pesticide_id : r.material_id;
+    return id===itemId;
+  }).reduce((s,r)=>s+parseFloat(r.amount||0),0);
+  return { inTotal, usedTotal, current: inTotal - usedTotal };
+}
+
+// 農薬マスタ
+function openAddPesticide(){ document.getElementById('addPesticideForm').style.display='block'; }
+function closeAddPesticide(){ document.getElementById('addPesticideForm').style.display='none'; }
+function savePesticideMaster(){
+  const id=document.getElementById('pi_id').value.trim();
+  const name=document.getElementById('pi_name').value.trim();
+  if(!id||!name){ alert('IDと農薬名は必須です'); return; }
+  const masters=getData('pesticideMaster');
+  if(masters.find(m=>m.id===id)){ alert('このIDはすでに登録されています'); return; }
+  masters.push({id,name,reg:document.getElementById('pi_reg').value,maker:document.getElementById('pi_maker').value,
+    size:document.getElementById('pi_size').value,unit:document.getElementById('pi_unit').value,
+    safe:document.getElementById('pi_safe').value});
+  setData('pesticideMaster',masters);
+  closeAddPesticide();
+  renderPesticideTable();
+  clearForm(['pi_id','pi_name','pi_reg','pi_maker','pi_size','pi_safe']);
+}
+function renderPesticideTable(){
+  const masters=getData('pesticideMaster');
+  const tbody=document.getElementById('pesticideTbody');
+  if(!masters.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="11">農薬を登録してください</td></tr>'; return; }
+  tbody.innerHTML=masters.map(m=>{
+    const {inTotal,usedTotal,current}=calcInvTotals('pesticide',m.id);
+    const pct=m.safe?Math.min(100,current/parseFloat(m.safe)*100):50;
+    const cls=current<=0?'inv-crit':(m.safe&&current<parseFloat(m.safe)?'inv-warn':'inv-ok');
+    return `<tr>
+      <td><span class="mono">${m.id}</span></td>
+      <td><strong>${m.name}</strong></td>
+      <td style="font-size:11px;">${m.reg||'—'}</td>
+      <td style="font-size:12px;">${m.size||'—'}</td>
+      <td>${m.unit}</td>
+      <td class="mono">${m.safe||'—'}</td>
+      <td class="mono">${inTotal.toFixed(1)}</td>
+      <td class="mono">${usedTotal.toFixed(1)}</td>
+      <td><strong class="mono">${current.toFixed(1)}</strong> ${m.unit}<div class="inv-bar"><div class="inv-bar-fill ${cls}" style="width:${Math.max(0,pct)}%"></div></div></td>
+      <td>${statusBadge(current,m.safe)}</td>
+      <td><button class="del-btn" onclick="deleteMaster('pesticideMaster','${m.id}',renderPesticideTable)">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// 肥料マスタ
+function openAddFertilizer(){ document.getElementById('addFertilizerForm').style.display='block'; }
+function closeAddFertilizer(){ document.getElementById('addFertilizerForm').style.display='none'; }
+function saveFertilizerMaster(){
+  const id=document.getElementById('fi_id').value.trim();
+  const name=document.getElementById('fi_name').value.trim();
+  if(!id||!name){ alert('IDと資材名は必須です'); return; }
+  const masters=getData('fertilizerMaster');
+  if(masters.find(m=>m.id===id)){ alert('このIDはすでに登録されています'); return; }
+  masters.push({id,name,maker:document.getElementById('fi_maker').value,npk:document.getElementById('fi_npk').value,
+    size:document.getElementById('fi_size').value,unit:document.getElementById('fi_unit').value,
+    safe:document.getElementById('fi_safe').value});
+  setData('fertilizerMaster',masters);
+  closeAddFertilizer();
+  renderFertilizerTable();
+  clearForm(['fi_id','fi_name','fi_maker','fi_npk','fi_size','fi_safe']);
+}
+function renderFertilizerTable(){
+  const masters=getData('fertilizerMaster');
+  const tbody=document.getElementById('fertilizerTbody');
+  if(!masters.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="11">資材を登録してください</td></tr>'; return; }
+  tbody.innerHTML=masters.map(m=>{
+    const {inTotal,usedTotal,current}=calcInvTotals('fertilizer',m.id);
+    const pct=m.safe?Math.min(100,current/parseFloat(m.safe)*100):50;
+    const cls=current<=0?'inv-crit':(m.safe&&current<parseFloat(m.safe)?'inv-warn':'inv-ok');
+    return `<tr>
+      <td><span class="mono">${m.id}</span></td>
+      <td><strong>${m.name}</strong></td>
+      <td style="font-size:11px;">${m.npk||'—'}</td>
+      <td style="font-size:12px;">${m.size||'—'}</td>
+      <td>${m.unit}</td>
+      <td class="mono">${m.safe||'—'}</td>
+      <td class="mono">${inTotal.toFixed(1)}</td>
+      <td class="mono">${usedTotal.toFixed(1)}</td>
+      <td><strong class="mono">${current.toFixed(1)}</strong> ${m.unit}<div class="inv-bar"><div class="inv-bar-fill ${cls}" style="width:${Math.max(0,pct)}%"></div></div></td>
+      <td>${statusBadge(current,m.safe)}</td>
+      <td><button class="del-btn" onclick="deleteMaster('fertilizerMaster','${m.id}',renderFertilizerTable)">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// 入荷記録
+function openInvInForm(){ 
+  document.getElementById('invInForm').style.display='block';
+  document.getElementById('ii_date').value=today();
+  updateInvInSelect();
+}
+function closeInvInForm(){ document.getElementById('invInForm').style.display='none'; }
+function updateInvInSelect(){
+  const type=document.getElementById('ii_type').value;
+  const masters = type==='pesticide' ? getData('pesticideMaster') : getData('fertilizerMaster');
+  document.getElementById('ii_item').innerHTML='<option value="">選択</option>'+
+    masters.map(m=>`<option value="${m.id}" data-unit="${m.unit}">${m.name}（${m.id}）</option>`).join('');
+  document.getElementById('ii_unit').value='';
+}
+document.getElementById('ii_item').addEventListener('change', function(){
+  const sel=this.options[this.selectedIndex];
+  document.getElementById('ii_unit').value=sel?.dataset?.unit||'';
+});
+function saveInvIn(){
+  const date=document.getElementById('ii_date').value;
+  const type=document.getElementById('ii_type').value;
+  const itemSel=document.getElementById('ii_item');
+  const itemId=itemSel.value;
+  const itemName=itemSel.options[itemSel.selectedIndex]?.text||'';
+  const amount=document.getElementById('ii_amount').value;
+  if(!date||!itemId||!amount){ alert('入荷日・資材・数量は必須です'); return; }
+  addData('invInRecords',{
+    id:uid(), date, type, itemId,
+    itemName:itemName.replace(/（.*）/,'').trim(),
+    amount:parseFloat(amount),
+    unit:document.getElementById('ii_unit').value,
+    supplier:document.getElementById('ii_supplier').value,
+    note:document.getElementById('ii_note').value
+  });
+  closeInvInForm();
+  renderInvInTable();
+  renderPesticideTable();
+  renderFertilizerTable();
+}
+function renderInvInTable(){
+  const records=getData('invInRecords');
+  const tbody=document.getElementById('invInTbody');
+  if(!records.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="8">入荷記録がありません</td></tr>'; return; }
+  tbody.innerHTML=records.map(r=>`<tr>
+    <td><span class="mono">${r.date}</span></td>
+    <td>${r.type==='pesticide'?'<span class="badge badge-citrus">農薬</span>':'<span class="badge badge-green">肥料</span>'}</td>
+    <td>${r.itemName}</td>
+    <td><strong class="mono">${r.amount}</strong></td>
+    <td>${r.unit}</td>
+    <td>${r.supplier||'—'}</td>
+    <td>${r.note||'—'}</td>
+    <td><button class="del-btn" onclick="deleteRecord('invInRecords','${r.id}',()=>{renderInvInTable();renderPesticideTable();renderFertilizerTable();})">🗑</button></td>
+  </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// 設定（園地）
+// ══════════════════════════════════════════════════════════
+function saveGarden(){
+  const code=document.getElementById('gd_code').value.trim();
+  const name=document.getElementById('gd_name').value.trim();
+  if(!code||!name){ alert('コードと園地名は必須です'); return; }
+  const gardens=getData('gardens');
+  if(gardens.find(g=>g.code===code)){ alert('このコードはすでに登録されています'); return; }
+  gardens.push({code,name,type:document.getElementById('gd_type').value,
+    area:document.getElementById('gd_area').value,
+    variety:document.getElementById('gd_variety').value,
+    note:document.getElementById('gd_note').value});
+  setData('gardens',gardens);
+  renderGardenTable();
+  clearForm(['gd_code','gd_name','gd_area','gd_variety','gd_note']);
+}
+
+function renderGardenTable(){
+  const gardens=getData('gardens');
+  const tbody=document.getElementById('gardenTbody');
+  if(!gardens.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="7">園地を登録してください</td></tr>'; return; }
+  tbody.innerHTML=gardens.map(g=>`<tr>
+    <td><strong class="mono">${g.code}</strong></td>
+    <td>${g.name}</td>
+    <td>${gardenTypeBadge(g.type)}</td>
+    <td class="mono">${g.area||'—'}</td>
+    <td>${g.variety||'—'}</td>
+    <td>${g.note||'—'}</td>
+    <td><button class="del-btn" onclick="deleteGarden('${g.code}')">🗑</button></td>
+  </tr>`).join('');
+}
+
+function deleteGarden(code){
+  if(!confirm('この園地を削除しますか？')) return;
+  const gardens=getData('gardens').filter(g=>g.code!==code);
+  setData('gardens',gardens);
+  renderGardenTable();
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function deleteRecord(key,id,cb){
+  if(!confirm('この記録を削除しますか？')) return;
+  const data=getData(key).filter(r=>r.id!==id);
+  setData(key,data);
+  if(cb) cb();
+}
+function deleteMaster(key,id,cb){
+  if(!confirm('このマスタを削除しますか？使用記録とのリンクが切れます。')) return;
+  const data=getData(key).filter(r=>r.id!==id);
+  setData(key,data);
+  if(cb) cb();
+}
+function clearForm(ids){ ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; }); }
+function showAlert(id,msg){ const el=document.getElementById(id); if(el){ el.textContent=msg; el.style.display='flex'; setTimeout(()=>el.style.display='none',3000); } }
+
+function exportCSV(type){
+  const dataMap={
+    bojo:{key:'bojoRecords',cols:['date','garden','crop','pesticide_name','dilution','amount','unit','remain','phi','harvest_date','worker','note']},
+    shihi:{key:'shihiRecords',cols:['date','garden','crop','material_name','npk','area','amount','unit','per10a','worker','note']},
+    harvest:{key:'harvestRecords',cols:['date','garden','crop','lot','amount','ship_date','dest','ship_amount','worker','note']},
+    teki:{key:'tekiRecords',cols:['date','garden','crop','rate','area','hours','count','worker','note']},
+  };
+  const {key,cols}=dataMap[type];
+  const records=getData(key);
+  if(!records.length){ alert('記録がありません'); return; }
+  const csv=[cols.join(','),...records.map(r=>cols.map(c=>`"${r[c]||''}"`).join(','))].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`日下農園_${type}_${today()}.csv`; a.click();
+}
+
+function exportAllData(){
+  const allData={};
+  Object.keys(KEYS).forEach(k=>allData[k]=getData(k));
+  const blob=new Blob([JSON.stringify(allData,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`日下農園_全データ_${today()}.json`; a.click();
+}
+function importData(){ document.getElementById('importFile').click(); }
+function doImport(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(confirm('データをインポートします。現在のデータは上書きされます。よろしいですか？')){
+        Object.keys(KEYS).forEach(k=>{ if(data[k]) setData(k,data[k]); });
+        alert('インポート完了'); location.reload();
+      }
+    }catch(err){ alert('ファイルの形式が正しくありません'); }
+  };
+  reader.readAsText(file);
+}
+function clearAllData(){
+  if(confirm('⚠️ 全データを削除します。この操作は元に戻せません。本当によろしいですか？')){
+    Object.values(KEYS).forEach(k=>localStorage.removeItem(k));
+    alert('全データを削除しました'); location.reload();
+  }
+}
+
+// ── INIT ──
+updateDashboard();
+</script>
+</body>
+</html>
